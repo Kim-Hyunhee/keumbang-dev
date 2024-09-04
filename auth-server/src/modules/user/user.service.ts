@@ -7,10 +7,12 @@ import * as bcrypt from 'bcrypt';
 export class UserService {
   constructor(private repository: UserRepository) {}
 
-  async fetchUser({ userName }: { userName: string }) {
-    return await this.repository.findUser({ where: { userName } });
+  // 사용자 찾기 로직
+  async fetchUser({ userName, id }: { userName?: string; id?: number }) {
+    return await this.repository.findUser({ where: { userName, id } });
   }
 
+  // 사용자 생성 로직
   async createUser(data: InsertUser) {
     const hasUser = await this.fetchUser({ userName: data.userName });
     if (hasUser) {
@@ -37,6 +39,7 @@ export class UserService {
       password: hashedPassword,
     });
 
+    // password 제외하고 user 정보 내려주기
     return exclude(user, ['password']);
   }
 }

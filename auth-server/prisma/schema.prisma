@@ -11,8 +11,18 @@ datasource db {
 model User {
   id                                Int                                 @id @default(autoincrement())
   userName                          String    
-  password                          String
-  refreshToken                      String?            
+  password                          String          
   createdAt                         DateTime                            @default(now())
   updatedAt                         DateTime                            @default(now()) @updatedAt
+
+  refreshTokens                     RefreshToken[]
+}
+
+model RefreshToken {
+  id                                Int                                 @id @default(autoincrement())
+  token                             String                              @unique
+  userId                            Int
+  expiresAt                         DateTime
+
+  user                              User                                @relation(fields: [userId], references: [id])
 }
