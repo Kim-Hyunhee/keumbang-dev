@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Status {
+  OrderPlaced // 주문 완료
+  PaymentCompleted // 입금 완료
+  Shipped // 발송 완료
+  PaymentTransferred // 송금 완료
+  Received // 수령 완료
+}
+
+
+
+model Item {
+  id                                Int                                 @id @default(autoincrement())
+  name                              String          
+  createdAt                         DateTime                            @default(now())
+  updatedAt                         DateTime                            @default(now()) @updatedAt
+
+  orders                            Order[]
+}
+
+model Order {
+  id                                Int                                 @id @default(autoincrement())
+  userId                            Int
+  itemId                            Int
+  invoiceType                       String
+  orderDate                         DateTime                            
+  quantity                          String
+  status                            Status                              @default(OrderPlaced)
+  orderNumber                       String    
+  deliveryAddress                   String
+  amount                            Int          
+  createdAt                         DateTime                            @default(now())
+  updatedAt                         DateTime                            @default(now()) @updatedAt
+
+  item                              Item                                @relation(fields: [itemId], references: [id])
+}
