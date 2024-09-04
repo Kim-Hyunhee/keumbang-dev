@@ -20,7 +20,7 @@ async function bootstrap() {
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('keumbang')
-    .setDescription('keumbang API DOCS')
+    .setDescription('keumbang Auth API DOCS')
     .setVersion('0.1')
     .addBearerAuth(
       {
