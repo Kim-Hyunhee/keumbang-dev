@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { OrderStatus } from './dto/put-order.dto';
+import { Status } from '@prisma/client'; // 'Status'는 Prisma에서 자동 생성된 enum
 
 @Injectable()
 export class OrderRepository {
@@ -67,6 +69,18 @@ export class OrderRepository {
       quantity?: string;
       deliveryAddress?: string;
       amount?: number;
+    };
+  }) {
+    return await this.prisma.order.update({ where, data });
+  }
+
+  async updateOrderByStatus({
+    where,
+    data,
+  }: {
+    where: { userId: number; id: number };
+    data: {
+      status: Status;
     };
   }) {
     return await this.prisma.order.update({ where, data });

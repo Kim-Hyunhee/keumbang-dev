@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { OrderRepository } from './order.repository';
+import { Status } from '@prisma/client';
 
 @Injectable()
 export class OrderService {
@@ -153,6 +154,21 @@ export class OrderService {
         deliveryAddress,
         amount,
       },
+    });
+  }
+
+  async modifyOrderByStatus({
+    userId,
+    orderId,
+    status,
+  }: {
+    userId: number;
+    orderId: number;
+    status: Status;
+  }) {
+    return await this.repository.updateOrderByStatus({
+      where: { userId, id: orderId },
+      data: { status },
     });
   }
 }
