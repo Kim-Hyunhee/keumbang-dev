@@ -117,7 +117,12 @@ export class OrderService {
   }
 
   async fetchOrder({ userId, orderId }: { userId: number; orderId: number }) {
-    return await this.repository.findOrder({ userId, id: orderId });
+    const order = await this.repository.findOrder({ userId, id: orderId });
+    if (!order) {
+      throw new NotFoundException('주문이 존재하지 않습니다.');
+    }
+
+    return order;
   }
 
   async modifyOrder({
@@ -135,10 +140,7 @@ export class OrderService {
     quantity?: string;
     deliveryAddress?: string;
   }) {
-    const order = await this.fetchOrder({ userId, orderId });
-    if (!order) {
-      throw new NotFoundException('주문이 존재하지 않습니다.');
-    }
+    await this.fetchOrder({ userId, orderId });
 
     let formattedQuantity = '';
     if (quantity) {
@@ -184,6 +186,14 @@ export class OrderService {
     return await this.repository.updateOrderByStatus({
       where: { userId, id: orderId },
       data: { status },
+    });
+  }
+
+  async removeOrder({ userId, orderId }: { userId: number; orderId: number }) {
+    await this.fetchOrder({ userId, orderId });
+
+    return await this.repository.deleteOrder({
+      where: { id: orderId, userId },
     });
   }
 }

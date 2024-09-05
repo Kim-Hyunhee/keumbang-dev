@@ -85,6 +85,12 @@ export class OrderRepository {
   }) {
     return await this.prisma.order.update({ where, data });
   }
+
+  async deleteOrder({ where }: { where: { id: number; userId: number } }) {
+    const data = { isDelete: 1 };
+
+    return await this.prisma.order.update({ where, data });
+  }
 }
 
 export type InsertOrder = {

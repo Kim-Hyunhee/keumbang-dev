@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -94,6 +95,18 @@ export class OrderController {
       userId,
       orderId,
       status,
+    });
+  }
+
+  @Delete('/:id')
+  @ApiOperation({ summary: '주문 삭제하기' })
+  async deleteOrder(
+    @User('userId') userId: number,
+    @Param('id', ParseIntPipe) orderId: number,
+  ) {
+    return await this.orderService.removeOrder({
+      userId,
+      orderId,
     });
   }
 }

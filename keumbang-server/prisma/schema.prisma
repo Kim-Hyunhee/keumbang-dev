@@ -39,7 +39,8 @@ model Order {
   status                            Status                              @default(OrderPlaced)
   orderNumber                       String    
   deliveryAddress                   String
-  amount                            Int          
+  amount                            Int 
+  isDelete                          Int                                 @default(0)         
   createdAt                         DateTime                            @default(now())
   updatedAt                         DateTime                            @default(now()) @updatedAt
 
