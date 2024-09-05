@@ -29,12 +29,6 @@ export class PutOrderDTO {
   @IsOptional()
   @IsString()
   deliveryAddress: string;
-
-  @ApiProperty({ example: 10000 })
-  @IsNumber()
-  @Type(() => Number)
-  @IsOptional()
-  amount: number;
 }
 
 export enum OrderStatus {

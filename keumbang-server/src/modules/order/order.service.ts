@@ -5,10 +5,14 @@ import {
 } from '@nestjs/common';
 import { OrderRepository } from './order.repository';
 import { Status } from '@prisma/client';
+import { ItemService } from '../item/item.service';
 
 @Injectable()
 export class OrderService {
-  constructor(private repository: OrderRepository) {}
+  constructor(
+    private repository: OrderRepository,
+    private itemService: ItemService,
+  ) {}
 
   async createOrder(data: {
     userId: number;
@@ -16,7 +20,6 @@ export class OrderService {
     invoiceType: string;
     quantity: string;
     deliveryAddress: string;
-    amount: number;
   }) {
     const orderDate = new Date(Date.now());
     const orderNumber = '' + Date.now();
@@ -30,11 +33,18 @@ export class OrderService {
     }
 
     const formattedQuantity = parseFloat(data.quantity).toFixed(2);
+    const item = await this.itemService.fetchItem({ itemId: data.itemId });
+
+    let amountValue = 0;
+    if (data.invoiceType === 'sales') {
+      amountValue = item.sellPrice * +data.quantity;
+    } else amountValue = item.buyPrice * +data.quantity;
 
     return await this.repository.insertOrder({
       orderDate,
       orderNumber,
       quantity: formattedQuantity,
+      amount: amountValue,
       ...data,
     });
   }
@@ -117,7 +127,6 @@ export class OrderService {
     invoiceType,
     quantity,
     deliveryAddress,
-    amount,
   }: {
     userId: number;
     orderId: number;
@@ -125,7 +134,6 @@ export class OrderService {
     invoiceType?: string;
     quantity?: string;
     deliveryAddress?: string;
-    amount?: number;
   }) {
     const order = await this.fetchOrder({ userId, orderId });
     if (!order) {
@@ -145,6 +153,13 @@ export class OrderService {
 
     formattedQuantity = parseFloat(quantity).toFixed(2);
 
+    const item = await this.itemService.fetchItem({ itemId });
+
+    let amountValue = 0;
+    if (invoiceType === 'sales') {
+      amountValue = item.sellPrice * +quantity;
+    } else amountValue = item.buyPrice * +quantity;
+
     return await this.repository.updateOrder({
       where: { userId, id: orderId },
       data: {
@@ -152,7 +167,7 @@ export class OrderService {
         invoiceType,
         quantity: formattedQuantity,
         deliveryAddress,
-        amount,
+        amount: amountValue,
       },
     });
   }

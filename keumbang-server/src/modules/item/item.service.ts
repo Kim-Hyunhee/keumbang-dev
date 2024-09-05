@@ -13,4 +13,13 @@ export class ItemService {
 
     return items;
   }
+
+  async fetchItem({ itemId }: { itemId: number }) {
+    const item = await this.repository.findItem({ id: itemId });
+    if (!item) {
+      throw new NotFoundException('아이템이 존재하지 않습니다.');
+    }
+
+    return item;
+  }
 }

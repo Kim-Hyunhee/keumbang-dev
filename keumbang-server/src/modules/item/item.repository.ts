@@ -8,4 +8,8 @@ export class ItemRepository {
   async findManyItem() {
     return await this.prisma.item.findMany();
   }
+
+  async findItem(where: { id: number }) {
+    return await this.prisma.item.findFirst({ where });
+  }
 }

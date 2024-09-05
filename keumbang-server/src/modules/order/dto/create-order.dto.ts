@@ -18,9 +18,4 @@ export class CreateOrderDTO {
   @IsNotEmpty()
   @IsString()
   deliveryAddress: string;
-
-  @ApiProperty({ example: 10000 })
-  @IsNumber()
-  @Type(() => Number)
-  amount: number;
 }
