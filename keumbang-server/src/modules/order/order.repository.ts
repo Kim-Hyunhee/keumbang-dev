@@ -55,6 +55,22 @@ export class OrderRepository {
   async findOrder(where: { userId: number; id: number }) {
     return await this.prisma.order.findFirst({ where });
   }
+
+  async updateOrder({
+    where,
+    data,
+  }: {
+    where: { userId: number; id: number };
+    data: {
+      itemId?: number;
+      invoiceType?: string;
+      quantity?: string;
+      deliveryAddress?: string;
+      amount?: number;
+    };
+  }) {
+    return await this.prisma.order.update({ where, data });
+  }
 }
 
 export type InsertOrder = {

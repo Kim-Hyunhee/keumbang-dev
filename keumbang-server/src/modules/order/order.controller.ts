@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -14,6 +15,7 @@ import { CreateOrderDTO } from './dto/create-order.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { User } from 'src/decorators/user.decorator';
 import { GetOrderDTO } from './dto/get-order.dto';
+import { PutOrderDTO } from './dto/put-order.dto';
 
 @ApiTags('orders')
 @ApiBearerAuth('access-token')
@@ -68,5 +70,15 @@ export class OrderController {
     @Param('id', ParseIntPipe) orderId: number,
   ) {
     return await this.orderService.fetchOrder({ userId, orderId });
+  }
+
+  @Put('/:id')
+  @ApiOperation({ summary: '내가 주문한 금 상세보기' })
+  async putOrder(
+    @User('userId') userId: number,
+    @Param('id', ParseIntPipe) orderId: number,
+    @Body() body: PutOrderDTO,
+  ) {
+    return await this.orderService.modifyOrder({ userId, orderId, ...body });
   }
 }

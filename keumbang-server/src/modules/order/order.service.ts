@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { OrderRepository } from './order.repository';
 
 @Injectable()
@@ -103,5 +107,52 @@ export class OrderService {
 
   async fetchOrder({ userId, orderId }: { userId: number; orderId: number }) {
     return await this.repository.findOrder({ userId, id: orderId });
+  }
+
+  async modifyOrder({
+    userId,
+    orderId,
+    itemId,
+    invoiceType,
+    quantity,
+    deliveryAddress,
+    amount,
+  }: {
+    userId: number;
+    orderId: number;
+    itemId?: number;
+    invoiceType?: string;
+    quantity?: string;
+    deliveryAddress?: string;
+    amount?: number;
+  }) {
+    const order = await this.fetchOrder({ userId, orderId });
+    if (!order) {
+      throw new NotFoundException('주문이 존재하지 않습니다.');
+    }
+
+    let formattedQuantity = '';
+    if (quantity) {
+      // 소수점 2자리까지만 적었는지 확인
+      const condition = new RegExp(/^\d+(\.\d{1,2})?$/);
+      if (!condition.test(quantity)) {
+        throw new BadRequestException(
+          'Quantity must be a valid number with up to 2 decimal places.',
+        );
+      }
+    }
+
+    formattedQuantity = parseFloat(quantity).toFixed(2);
+
+    return await this.repository.updateOrder({
+      where: { userId, id: orderId },
+      data: {
+        itemId,
+        invoiceType,
+        quantity: formattedQuantity,
+        deliveryAddress,
+        amount,
+      },
+    });
   }
 }
