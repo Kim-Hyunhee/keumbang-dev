@@ -51,6 +51,10 @@ export class OrderRepository {
 
     return { orders, totalCount };
   }
+
+  async findOrder(where: { userId: number; id: number }) {
+    return await this.prisma.order.findFirst({ where });
+  }
 }
 
 export type InsertOrder = {

@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { OrderService } from './order.service';
 import { CreateOrderDTO } from './dto/create-order.dto';
@@ -50,5 +59,14 @@ export class OrderController {
     @Query() query: GetOrderDTO,
   ) {
     return await this.orderService.fetchManyOrder({ userId, ...query });
+  }
+
+  @Get('/:id')
+  @ApiOperation({ summary: '내가 주문한 금 상세보기' })
+  async getOrder(
+    @User('userId') userId: number,
+    @Param('id', ParseIntPipe) orderId: number,
+  ) {
+    return await this.orderService.fetchOrder({ userId, orderId });
   }
 }

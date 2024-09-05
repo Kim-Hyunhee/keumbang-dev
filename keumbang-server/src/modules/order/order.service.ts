@@ -100,4 +100,8 @@ export class OrderService {
       links,
     };
   }
+
+  async fetchOrder({ userId, orderId }: { userId: number; orderId: number }) {
+    return await this.repository.findOrder({ userId, id: orderId });
+  }
 }
