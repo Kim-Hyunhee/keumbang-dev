@@ -3,6 +3,8 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { Transport, MicroserviceOptions } from '@nestjs/microservices';
+import * as path from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -18,9 +20,22 @@ async function bootstrap() {
     }),
   );
 
+  // gRPC microservice
+  const grpcOptions: MicroserviceOptions = {
+    transport: Transport.GRPC,
+    options: {
+      package: 'auth', // Matches proto package
+      protoPath: path.join(process.cwd(), 'src/protos/auth.proto'),
+      url: '0.0.0.0:50051', // gRPC port for Server B
+    },
+  };
+
+  app.connectMicroservice(grpcOptions);
+  await app.startAllMicroservices();
+
   const swaggerConfig = new DocumentBuilder()
     .setTitle('keumbang')
-    .setDescription('keumbang Auth API DOCS')
+    .setDescription('keumbang AUTH API DOCS')
     .setVersion('0.1')
     .addBearerAuth(
       {

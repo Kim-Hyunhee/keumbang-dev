@@ -3,6 +3,8 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { Transport, MicroserviceOptions } from '@nestjs/microservices';
+import * as path from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -17,6 +19,19 @@ async function bootstrap() {
       transform: true, // 요청 데이터를 자동으로 DTO 인스턴스로 변환
     }),
   );
+
+  // gRPC microservice
+  const grpcOptions: MicroserviceOptions = {
+    transport: Transport.GRPC,
+    options: {
+      package: 'resource', // Matches proto package
+      protoPath: path.join(process.cwd(), 'src/protos/resource.proto'),
+      url: '0.0.0.0:50052', // gRPC port for Server A
+    },
+  };
+
+  app.connectMicroservice(grpcOptions);
+  await app.startAllMicroservices();
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('keumbang')

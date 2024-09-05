@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package auth;
+
+// gRPC 서비스 정의
+service AuthService {
+  // 로그인 메서드
+  rpc Login (LoginRequest) returns (LoginResponse);
+  
+  // 토큰 유효성 검증 메서드
+  rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
+  
+  // 사용자 정보 조회 메서드
+  rpc GetUserInfo (UserInfoRequest) returns (UserInfoResponse);
+}
+
+// 로그인 요청 메시지
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+// 로그인 응답 메시지
+message LoginResponse {
+  string accessToken = 1;
+  string refreshToken = 2;
+}
+
+// 토큰 유효성 검증 요청 메시지
+message ValidateTokenRequest {
+  string token = 1;
+}
+
+// 토큰 유효성 검증 응답 메시지
+message ValidateTokenResponse {
+  bool is_valid = 1;
+  string user_id = 2;
+}
+
+// 사용자 정보 요청 메시지
+message UserInfoRequest {
+  string userId = 1;
+}
+
+// 사용자 정보 응답 메시지
+message UserInfoResponse {
+  string userId = 1;
+  string username = 2;
+}
