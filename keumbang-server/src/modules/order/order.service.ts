@@ -33,4 +33,71 @@ export class OrderService {
       ...data,
     });
   }
+
+  async fetchManyOrder({
+    userId,
+    date,
+    limit,
+    offset,
+    invoiceType,
+  }: {
+    userId: number;
+    date: Date;
+    limit: number;
+    offset: number;
+    invoiceType: string;
+  }) {
+    const options = { timeZone: 'Asia/Seoul' };
+
+    const startDate = new Date(date.toLocaleString('en-US', options));
+    startDate.setUTCDate(startDate.getDate());
+    startDate.setUTCHours(0, 0, 0, 0);
+
+    const endDate = new Date(date.toLocaleString('en-US', options));
+    endDate.setUTCHours(23, 59, 59, 999);
+
+    const { orders, totalCount } = await this.repository.findManyOrder({
+      userId,
+      startDate,
+      endDate,
+      limit,
+      offset,
+      invoiceType,
+    });
+
+    // pagination 정보 계산
+    const totalPages = Math.ceil(totalCount / limit);
+
+    const baseUrl = 'http://localhost:9999/api/orders';
+
+    const links = {
+      self: {
+        href: `${baseUrl}?limit=${limit}&offset=${offset}`,
+      },
+      first: {
+        href: `${baseUrl}?limit=${limit}&offset=0`,
+      },
+      last: {
+        href: `${baseUrl}?limit=${limit}&offset=${(totalPages - 1) * limit}`,
+      },
+      next: {
+        href:
+          offset + limit < totalCount
+            ? `${baseUrl}?limit=${limit}&offset=${offset + limit}`
+            : null,
+      },
+      prev: {
+        href:
+          offset - limit >= 0
+            ? `${baseUrl}?limit=${limit}&offset=${offset - limit}`
+            : null,
+      },
+    };
+    return {
+      success: true,
+      message: 'Success to search orders',
+      data: orders,
+      links,
+    };
+  }
 }

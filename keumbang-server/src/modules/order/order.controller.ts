@@ -1,9 +1,10 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { OrderService } from './order.service';
 import { CreateOrderDTO } from './dto/create-order.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { User } from 'src/decorators/user.decorator';
+import { GetOrderDTO } from './dto/get-order.dto';
 
 @ApiTags('orders')
 @ApiBearerAuth('access-token')
@@ -40,5 +41,14 @@ export class OrderController {
       invoiceType,
       ...body,
     });
+  }
+
+  @Get()
+  @ApiOperation({ summary: '내가 주문한 금 목록' })
+  async getManyOrder(
+    @User('userId') userId: number,
+    @Query() query: GetOrderDTO,
+  ) {
+    return await this.orderService.fetchManyOrder({ userId, ...query });
   }
 }
