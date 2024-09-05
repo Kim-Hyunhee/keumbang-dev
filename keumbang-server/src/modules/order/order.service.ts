@@ -118,7 +118,7 @@ export class OrderService {
 
   async fetchOrder({ userId, orderId }: { userId: number; orderId: number }) {
     const order = await this.repository.findOrder({ userId, id: orderId });
-    if (!order) {
+    if (!order || order.isDelete) {
       throw new NotFoundException('주문이 존재하지 않습니다.');
     }
 
@@ -183,6 +183,8 @@ export class OrderService {
     orderId: number;
     status: Status;
   }) {
+    await this.fetchOrder({ userId, orderId });
+
     return await this.repository.updateOrderByStatus({
       where: { userId, id: orderId },
       data: { status },
