@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpStatus,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -9,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { Payload } from './jwt.strategy';
 import { JwtService } from '@nestjs/jwt';
 import { RefreshTokenService } from '../refresh-token/refresh-token.service';
+import { GrpcMethod } from '@nestjs/microservices';
 
 @Injectable()
 export class AuthService {
@@ -94,6 +96,51 @@ export class AuthService {
       return { accessToken: newAccessToken };
     } catch (error) {
       throw new UnauthorizedException('Invalid Refresh Token');
+    }
+  }
+
+  @GrpcMethod('AuthService', 'VerifyToken')
+  async VerifyToken(data: { token: string }) {
+    console.log('gRPC VerifyToken called with token:', data.token);
+    const { token } = data;
+
+    console.log(data);
+    try {
+      const decoded = this.jwtService.verify(token);
+      if (decoded) {
+        return {
+          isValid: true,
+          user: {
+            userId: decoded.userId,
+          },
+        };
+      }
+    } catch (error) {
+      return error;
+    }
+
+    return {
+      isValid: false,
+      user: null,
+    };
+  }
+
+  async validateToken(token: string) {
+    try {
+      const decoded = this.jwtService.verify(token);
+
+      // console.log('Decoded token:', decoded); // 콘솔에 출력
+      return {
+        isValid: true,
+        user: decoded,
+      };
+    } catch (e) {
+      // console.error('Token validation error:', e); // 오류 메시지 출력
+      throw new UnauthorizedException({
+        status: HttpStatus.UNAUTHORIZED,
+        error: 'Invalid token',
+        message: e.message, // 원래 에러 메시지 포함
+      });
     }
   }
 }

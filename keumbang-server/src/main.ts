@@ -24,9 +24,9 @@ async function bootstrap() {
   const grpcOptions: MicroserviceOptions = {
     transport: Transport.GRPC,
     options: {
-      package: 'resource', // Matches proto package
-      protoPath: path.join(process.cwd(), 'src/protos/resource.proto'),
-      url: '0.0.0.0:50052', // gRPC port for Server A
+      package: 'auth', // Matches proto package
+      protoPath: path.join(process.cwd(), 'src/protos/auth.proto'),
+      url: '0.0.0.0:50052', // gRPC port for Server B
     },
   };
 
